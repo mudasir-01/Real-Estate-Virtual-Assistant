@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const PHONE = "+923296649407";
 const DISPLAY_PHONE = "+92 329 6649407";
 const EMAIL = "muhammadmudasir5223@gmail.com";
-const LINKEDIN = "https://www.linkedin.com/in/muhammad-mudasir-785340415";
+const LINKEDIN = "https://www.linkedin.com/in/m-mudasir02";
 
 const services = [
   {
@@ -25,7 +25,14 @@ const services = [
     title: "Appointment Setting",
     text: "Qualified conversations turned into booked appointments so you can focus on closing and building relationships.",
     price: "$100",
-    unit: "3 appointments"
+    unit: "2 confirmed appointments"
+  },
+  {
+    icon: "◈",
+    title: "Skip Tracing",
+    text: "Locate accurate contact details for property owners so your outreach reaches the right person, every time.",
+    price: "Custom",
+    unit: "quote on request"
   }
 ];
 
@@ -66,25 +73,26 @@ function App() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setStatus("Sending...");
 
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      });
+    const lines = [
+      "Hi, I'd like to get in touch about a Real Estate VA service.",
+      "",
+      `Name: ${form.name}`,
+      `Email: ${form.email}`,
+      form.phone ? `Phone: ${form.phone}` : null,
+      `Service: ${form.service}`,
+      "",
+      `Message: ${form.message}`
+    ].filter(Boolean);
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Unable to send.");
+    const waMessage = encodeURIComponent(lines.join("\n"));
+    const waUrl = `https://wa.me/${PHONE.replace("+", "")}?text=${waMessage}`;
 
-      setStatus("Thanks! Your message has been sent. I'll get back to you shortly.");
-      setForm({ name: "", email: "", phone: "", service: "", message: "" });
-    } catch (error) {
-      setStatus("The form could not send right now. Please use WhatsApp or email below.");
-    }
+    setStatus("Opening WhatsApp with your details...");
+    window.open(waUrl, "_blank");
+    setForm({ name: "", email: "", phone: "", service: "", message: "" });
   };
 
   return (
@@ -331,9 +339,16 @@ function App() {
               <article className="price-card">
                 <span className="price-label">APPOINTMENT SETTING</span>
                 <div className="price">$100</div>
-                <p>3 qualified appointments</p>
+                <p>2 confirmed appointments</p>
                 <ul><li>Prospect follow-up</li><li>Qualification conversations</li><li>Calendar-ready appointments</li></ul>
                 <a href="#contact">Order / Ask a Question →</a>
+              </article>
+              <article className="price-card">
+                <span className="price-label">SKIP TRACING</span>
+                <div className="price">Custom</div>
+                <p>Pricing available on request</p>
+                <ul><li>Owner contact lookup</li><li>Phone & address matching</li><li>Delivered in your format</li></ul>
+                <a href={`https://wa.me/${PHONE.replace("+","")}?text=${encodeURIComponent("Hi, I'd like a quote for Skip Tracing.")}`} target="_blank" rel="noreferrer">Ask for Quote →</a>
               </article>
             </div>
             <div className="custom-banner">
@@ -412,9 +427,9 @@ function App() {
                 <label>Service<select name="service" value={form.service} onChange={handleChange} required><option value="">Select a service</option><option>Lead Generation</option><option>Cold Calling</option><option>Appointment Setting</option><option>Custom Campaign</option></select></label>
               </div>
               <label>Message<textarea name="message" value={form.message} onChange={handleChange} placeholder="Tell me your target market, lead type, quantity and timeline..." rows="5" required></textarea></label>
-              <button className="btn btn-primary submit-btn" type="submit">Send Inquiry <span>→</span></button>
+              <button className="btn btn-primary submit-btn" type="submit">Send via WhatsApp <span>→</span></button>
               {status && <p className="form-status">{status}</p>}
-              <p className="form-small">Your message is sent to the email address configured in the project's server environment.</p>
+              <p className="form-small">Clicking submit opens WhatsApp with your details pre-filled — just hit send there.</p>
             </form>
           </div>
         </section>
